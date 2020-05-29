@@ -1,18 +1,19 @@
-//#region Action Types
-import {Driver} from "../model/driver";
+import {Driver} from "../services/drivers.service";
+import {Dispatch} from "redux";
 
+//#region Action Types
 export const ACTIVE_DRIVER_REQUEST = 'ACTIVE_DRIVER_REQUEST';
 export const ACTIVE_DRIVER_SUCCESS = 'ACTIVE_DRIVER_SUCCESS';
 export const ACTIVE_DRIVER_FAILURE = 'ACTIVE_DRIVER_FAILURE';
 //#endregion
 
 //#region Action Creators
-export const activeDriversRequest = () => {
+export const activeDriversRequest = (): ActiveDriverRequestActionType => {
     return {
         type: ACTIVE_DRIVER_REQUEST,
     }
 };
-export const activeDriversSuccess = (driver: Driver) => {
+export const activeDriversSuccess = (driver: Driver): ActiveDriverSuccessActionType => {
     return {
         type: ACTIVE_DRIVER_SUCCESS,
         payload: {
@@ -20,7 +21,7 @@ export const activeDriversSuccess = (driver: Driver) => {
         }
     }
 };
-export const activeDriversFailure = (errors: []) => {
+export const activeDriversFailure = (errors: []): ActiveDriverFailureActionType => {
     return {
         type: ACTIVE_DRIVER_FAILURE,
         payload: {
@@ -36,8 +37,8 @@ const initialState: State = {
     loading: false,
     errors: [],
 };
-export const activeDriver = (state: State = initialState, {type, payload}: Action) => {
-    switch (type) {
+export const activeDriver = (state: State = initialState, action: ActionTypes): State => {
+    switch (action.type) {
         case ACTIVE_DRIVER_REQUEST:
             return {
                 ...state,
@@ -47,13 +48,13 @@ export const activeDriver = (state: State = initialState, {type, payload}: Actio
             return {
                 ...state,
                 loading: false,
-                data: payload.driver
+                data: action.payload.driver
             };
         case ACTIVE_DRIVER_FAILURE:
             return {
                 ...state,
                 loading: false,
-                errors: state.errors.concat(payload.errors)
+                errors: state.errors.concat(action.payload.errors)
             };
         default:
             return state;
@@ -62,24 +63,35 @@ export const activeDriver = (state: State = initialState, {type, payload}: Actio
 //#endregion
 
 //#region Thunk
-export const requestActiveDriver = (driver: Driver) => async (dispatch: any) => {
+export const requestActiveDriver = (driver: Driver) => async (dispatch: Dispatch<ActionTypes>) => {
     dispatch(activeDriversRequest());
     try {
         dispatch(activeDriversSuccess(driver));
     } catch (e) {
         dispatch(activeDriversFailure(e))
-    }//#region Action Types
+    }
 };
-
+//#region Action Types
 type State = {
     data: Driver,
     loading: boolean
-    errors: [],
+    errors: string[],
 }
-type Action = {
-    type: string,
-    payload: {
-        driver: Driver,
-        errors: [],
-    },
+type ActiveDriverRequestActionType = {
+    type: typeof ACTIVE_DRIVER_REQUEST,
 }
+type ActiveDriverSuccessActionType = {
+    type: typeof ACTIVE_DRIVER_SUCCESS,
+    payload: ActiveDriverSuccessPayloadType,
+}
+type ActiveDriverSuccessPayloadType = {
+    driver: Driver,
+}
+type ActiveDriverFailureActionType = {
+    type: typeof ACTIVE_DRIVER_FAILURE,
+    payload: ActiveDriverFailurePayloadType,
+}
+type ActiveDriverFailurePayloadType = {
+    errors: string[],
+}
+type ActionTypes = ActiveDriverRequestActionType | ActiveDriverSuccessActionType | ActiveDriverFailureActionType;

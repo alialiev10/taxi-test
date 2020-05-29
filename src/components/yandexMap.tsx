@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import {YMaps, Map, Placemark,} from "react-yandex-maps";
 import {useSelector} from "react-redux";
 import {Store} from "../store";
-import {Driver} from "../model/driver";
+import {Driver} from "../services/drivers.service";
 
 const YandexMap: React.FC<Props> = (
     {
@@ -29,7 +29,7 @@ const YandexMap: React.FC<Props> = (
                     height={height}
                     onClick={(event: any) => {
                         let coordinates = event.get('coords');
-                        clickOnMap(coordinates)
+                        clickOnMap && clickOnMap(coordinates)
                     }}
                 >
                     <Placemark
@@ -75,6 +75,6 @@ type Props = {
     width?: number,
     height?: number,
     coordinates?: [],
-    clickOnMap?: any,
+    clickOnMap?: (coordinates: []) => void,
     drivers?: Driver[],
 }

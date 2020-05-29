@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components'
-import {Driver as DriverType} from "../model/driver";
+import {Driver as DriverType} from "../services/drivers.service";
 import Driver from "./driver";
 import 'antd/dist/antd.css';
 import {Spin} from 'antd';

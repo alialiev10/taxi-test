@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components'
 import { CarOutlined, RightOutlined } from '@ant-design/icons';
-import {Driver as DriverType} from "../model/driver";
+import {Driver as DriverType} from "../services/drivers.service";
 const Driver: React.FC<Props> = ({isActive, driver, onClick}) => {
     return (
        <Container

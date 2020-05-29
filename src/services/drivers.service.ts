@@ -10,7 +10,7 @@ const driverService = {
 
 export default driverService;
 
-type Driver = {
+export type Driver = {
     crew_id: number,
     car_mark: string,
     car_model: string,
@@ -23,6 +23,6 @@ type Driver = {
     distance: number,
 }
 
-type DriversResponse = Response<{
+export type DriversResponse = Response<{
     crews_info: Driver[]
 }>

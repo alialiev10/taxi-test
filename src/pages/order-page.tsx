@@ -8,10 +8,9 @@ import {requestDrivers} from "../store/drivers";
 import {useDispatch, useSelector} from "react-redux";
 import {Store} from "../store";
 import {requestClientCoordinates} from "../store/clientCoordinates";
-import {Driver} from "../model/driver";
 import {requestActiveDriver} from "../store/activeDriver";
+import {Driver} from "../services/drivers.service";
 import geocodeService from "../services/geocode.service";
-import {debounce} from "underscore";
 
 const OrderPage: React.FC = () => {
     const dispatch = useDispatch();
@@ -19,21 +18,26 @@ const OrderPage: React.FC = () => {
     const driversLoading = useSelector((state: Store) => state.drivers.loading);
     const [isDisabled, setIsDisabled] = useState<boolean>(true);
     const activeDriver = useSelector((state: Store) => state.activeDriver.data);
-    const clientCoordinates = useSelector((state: Store) => state.clientCoordinates.data);
-    const [addressClient, setAddressClient] = useState<string>('');
-    const order = {
-        source_time: Date.now(),
-        addresses: [
-            {
-                address: 'Ул.Ленина, дом 20',
-                lat: activeDriver.lat,
-                lon: activeDriver.lon,
-            }
-        ],
-        crew_id: activeDriver.crew_id,
+    const clientCoordinates: number[] = useSelector((state: Store) => state.clientCoordinates.data);
+    const [addressClient, setAddressClient] = useState<AddressClient>({
+        address: '',
+        coordinates: clientCoordinates,
+    });
+    const handleSubmit = () => {
+            console.log({
+            source_time: Date.now(),
+            addresses: [
+                {
+                    address: 'Ул.Ленина, дом 20',
+                    lat: activeDriver.lat,
+                    lon: activeDriver.lon,
+                }
+            ],
+            crew_id: activeDriver.crew_id,
+        })
     };
     const handleSearchButton = () => {
-        dispatch(requestClientCoordinates([56.84565005145864, 53.20868570373535]));
+        dispatch(requestClientCoordinates(geocodeService.decode(addressClient.address)));
         dispatch(requestDrivers())
     };
     return (
@@ -48,9 +52,12 @@ const OrderPage: React.FC = () => {
                 <SearchButtonWrap>
                     <AppInput
                         placeholder={'Улица, номер дома'}
-                        value={addressClient}
+                        value={addressClient.address}
                         onChange={(e) => {
-                            setAddressClient(e.target.value);
+                            setAddressClient({
+                                ...addressClient,
+                                address: e.target.value,
+                            });
                         }}/>
                     <SearchButton onClick={(e) => {
                         e.preventDefault();
@@ -66,8 +73,12 @@ const OrderPage: React.FC = () => {
                         dispatch(requestClientCoordinates(coordinates));
                         dispatch(requestDrivers());
                         dispatch(requestActiveDriver({} as Driver));
-                        setAddressClient('Улица Ленина, дом 20');
-                        setIsDisabled(true)
+                        setAddressClient({
+                            ...addressClient,
+                            address: geocodeService.decode(clientCoordinates)
+                        });
+                        setIsDisabled(true);
+                        console.log(geocodeService.decode(clientCoordinates))
                     }}
                     drivers={drivers}
                     width={545}
@@ -81,7 +92,7 @@ const OrderPage: React.FC = () => {
             <AppButtonWrap>
                 <AppButton
                     disabled={isDisabled}
-                    onClick={() => console.log(order)}>
+                    onClick={() => handleSubmit()}>
                     Заказать
                 </AppButton>
             </AppButtonWrap>
@@ -187,3 +198,7 @@ const SearchButtonWrap = styled.div`
   display: flex;
   flex-direction: row;
 `;
+type AddressClient = {
+    address: string,
+    coordinates: number[],
+}

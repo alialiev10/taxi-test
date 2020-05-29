@@ -1,6 +1,7 @@
 //#region Action Types
-import {Driver} from "../model/driver";
+import {Driver} from "../services/drivers.service";
 import driverService from "../services/drivers.service";
+import {Dispatch} from "redux";
 
 export const CLIENT_COORDINATES_REQUEST = 'CLIENT_COORDINATES_REQUEST';
 export const CLIENT_COORDINATES_SUCCESS = 'CLIENT_COORDINATES_SUCCESS';
@@ -8,12 +9,12 @@ export const CLIENT_COORDINATES_FAILURE = 'CLIENT_COORDINATES_FAILURE';
 //#endregion
 
 //#region Action Creators
-export const clientCoordinatesRequest = () => {
+export const clientCoordinatesRequest = (): ClientCoordinatesRequestActionType => {
     return {
         type: CLIENT_COORDINATES_REQUEST,
     }
 };
-export const clientCoordinatesSuccess = (coordinates: []) => {
+export const clientCoordinatesSuccess = (coordinates: number[]): ClientCoordinatesSuccessActionType=> {
     return {
         type: CLIENT_COORDINATES_SUCCESS,
         payload: {
@@ -21,7 +22,7 @@ export const clientCoordinatesSuccess = (coordinates: []) => {
         }
     }
 };
-export const clientCoordinatesFailure = (errors: []) => {
+export const clientCoordinatesFailure = (errors: []): ClientCoordinatesFailureActionType => {
     return {
         type: CLIENT_COORDINATES_FAILURE,
         payload: {
@@ -37,8 +38,8 @@ const initialState: State = {
     loading: false,
     errors: [],
 };
-export const clientCoordinates = (state: State = initialState, {type, payload}: Action) => {
-    switch (type) {
+export const clientCoordinates = (state: State = initialState, action: ActionTypes): State => {
+    switch (action.type) {
         case CLIENT_COORDINATES_REQUEST:
             return {
                 ...state,
@@ -48,13 +49,13 @@ export const clientCoordinates = (state: State = initialState, {type, payload}: 
             return {
                 ...state,
                 loading: false,
-                data: payload.coordinates,
+                data: action.payload.coordinates,
             };
         case CLIENT_COORDINATES_FAILURE:
             return {
                 ...state,
                 loading: false,
-                errors: state.data.concat(payload.errors)
+                errors: state.errors.concat(action.payload.errors)
             };
         default:
             return state;
@@ -63,7 +64,7 @@ export const clientCoordinates = (state: State = initialState, {type, payload}: 
 //#endregion
 
 //#region Thunk
-export const requestClientCoordinates = (coordinates: any) => async (dispatch: any) => {
+export const requestClientCoordinates = (coordinates: number[]) => async (dispatch: Dispatch<ActionTypes>) => {
     dispatch(clientCoordinatesRequest());
     try {
         dispatch(clientCoordinatesSuccess(coordinates));
@@ -77,12 +78,23 @@ export const requestClientCoordinates = (coordinates: any) => async (dispatch: a
 type State = {
     data: number[],
     loading: boolean
-    errors: [],
+    errors: string[],
 }
-type Action = {
-    type: string,
-    payload: {
-        coordinates?: [],
-        errors: [],
-    },
+type ClientCoordinatesRequestActionType = {
+    type: typeof CLIENT_COORDINATES_REQUEST,
 }
+type ClientCoordinatesSuccessActionType = {
+    type: typeof CLIENT_COORDINATES_SUCCESS,
+    payload: ClientCoordinatesSuccessPayloadType
+}
+type ClientCoordinatesSuccessPayloadType = {
+    coordinates: number[],
+}
+type ClientCoordinatesFailureActionType = {
+    type: typeof CLIENT_COORDINATES_FAILURE,
+    payload: ClientCoordinatesFailurePayloadType
+}
+type ClientCoordinatesFailurePayloadType = {
+    errors: string[],
+}
+type ActionTypes = ClientCoordinatesRequestActionType | ClientCoordinatesSuccessActionType | ClientCoordinatesFailureActionType;

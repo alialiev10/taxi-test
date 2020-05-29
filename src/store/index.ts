@@ -2,7 +2,7 @@ import {combineReducers, createStore, applyMiddleware, compose} from "redux";
 import thunk from 'redux-thunk'
 import {composeWithDevTools} from "redux-devtools-extension";
 import {drivers} from "./drivers";
-import {Driver} from "../model/driver";
+import {Driver} from "../services/drivers.service";
 import {clientCoordinates} from "./clientCoordinates";
 import {activeDriver} from "./activeDriver";
 
@@ -25,17 +25,13 @@ export type Store = {
         loading: boolean
     },
     clientCoordinates: {
-        data: [],
+        data: number[],
         loading: false,
         errors: [],
     }
     activeDriver: {
         data: Driver,
         loading: boolean
-        errors: [],
-    },
-    addressClient: {
-        data: '',
         errors: [],
     },
 };
