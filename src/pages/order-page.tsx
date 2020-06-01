@@ -39,6 +39,8 @@ const OrderPage: React.FC = () => {
     const handleSearchButton = () => {
         dispatch(requestClientCoordinates(geocodeService.decode(addressClient.address)));
         dispatch(requestDrivers())
+        dispatch(requestActiveDriver({} as Driver));
+        setIsDisabled(true);
     };
     return (
         <Container>
